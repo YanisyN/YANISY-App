@@ -1,0 +1,190 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>YANISY Mini App</title>
+    <style>
+        :root {
+            --bg-color: #0A0A0A;
+            --accent-color: #FF007F;
+            --text-color: #FFFFFF;
+            --card-bg: #161616;
+        }
+        body {
+            font-family: sans-serif;
+            margin: 0; padding: 0;
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            display: flex; flex-direction: column; height: 100vh;
+        }
+        .content { flex: 1; padding: 20px; overflow-y: auto; display: none; }
+        .content.active { display: block; }
+        
+        .level-buttons { display: flex; flex-direction: column; gap: 15px; margin-top: 20px; }
+        .btn {
+            background-color: var(--card-bg);
+            color: var(--text-color);
+            border: 2px solid var(--accent-color);
+            padding: 15px; border-radius: 12px;
+            font-size: 16px; font-weight: bold; cursor: pointer;
+            box-shadow: 0 0 10px rgba(255, 0, 127, 0.2);
+            text-align: center; text-decoration: none;
+        }
+        .btn:active { background-color: var(--accent-color); }
+        
+        #tasks-list { display: none; margin-top: 20px; }
+        .task-item {
+            background: var(--card-bg); padding: 15px;
+            border-radius: 10px; margin-bottom: 10px;
+            display: flex; justify-content: space-between; align-items: center;
+        }
+
+        .tab-bar {
+            display: flex; border-top: 1px solid #222;
+            background-color: var(--bg-color); padding-bottom: env(safe-area-inset-bottom);
+        }
+        .tab-item {
+            flex: 1; text-align: center; padding: 12px 0; cursor: pointer;
+            font-size: 11px; color: #666; display: flex; flex-direction: column; align-items: center; gap: 4px;
+        }
+        .tab-item.active { color: var(--accent-color); font-weight: bold; }
+        .tab-icon { font-size: 20px; }
+        
+        .accent-text { color: var(--accent-color); font-weight: bold; }
+        input {
+            width: 100%; padding: 12px; margin-top: 10px; box-sizing: border-box;
+            background: var(--card-bg); border: 1px solid #333; color: #fff; border-radius: 8px;
+        }
+    </style>
+</head>
+<body>
+
+    <!-- 1. ЗАДАНИЯ -->
+    <div id="tasks-page" class="content active">
+        <h2>📋 Задания</h2>
+        <div id="levels-menu" class="level-buttons">
+            <div class="btn" onclick="showOffers('easy')">🟢 Лёгкие задания (2-15 ₽)</div>
+            <div class="btn" onclick="showOffers('medium')">🟡 Средние задания (15-100 ₽)</div>
+            <div class="btn" onclick="showOffers('hard')">🔴 Сложные задания (100+ ₽)</div>
+        </div>
+        <div id="tasks-list">
+            <button class="btn" style="width:100%; margin-bottom:15px; background:#222;" onclick="backToLevels()">⬅️ Назад к уровням</button>
+            <div id="offers-container"></div>
+        </div>
+    </div>
+
+    <!-- 2. СТАТИСТИКА -->
+    <div id="stats-page" class="content">
+        <h2>📊 Статистика</h2>
+        <div class="btn" style="margin-bottom:20px; font-size:20px;">Баланс: <span id="balance-val" class="accent-text">30</span> коинов</div>
+        <p>Выполнено заданий: <span id="completed-val" class="accent-text">0</span> шт.</p>
+        <p>Вы пришли от партнера: <span id="source-val" class="accent-text">Загрузка...</span></p>
+    </div>
+
+    <!-- 3. ПОДДЕРЖКА -->
+    <div id="support-page" class="content">
+        <h2>🆘 Поддержка</h2>
+        <p>Возникли проблемы? Напиши создателю проекта!</p>
+        <a href="https://t.me" target="_blank" class="btn" style="display:block;">Написать в Telegram</a>
+    </div>
+
+    <!-- 4. ВЫВОД -->
+    <div id="withdraw-page" class="content">
+        <h2>💸 Вывод средств</h2>
+        <p>Минимальный вывод — 100 коинов.</p>
+        <input type="number" id="withdraw-amount" placeholder="Сколько коинов вывести?">
+        <input type="text" id="withdraw-wallet" placeholder="Ваш кошелек Litecoin (LTC)">
+        <button class="btn" style="width:100%; margin-top:15px; background:var(--accent-color);" onclick="sendWithdraw()">Отправить заявку</button>
+    </div>
+
+    <!-- ТАБ-БАР -->
+    <div class="tab-bar">
+        <div class="tab-item active" onclick="switchTab('tasks-page', this)">
+            <span class="tab-icon">📋</span><span>Задания</span>
+        </div>
+        <div class="tab-item" onclick="switchTab('stats-page', this)">
+            <span class="tab-icon">📊</span><span>Статистика</span>
+        </div>
+        <div class="tab-item" onclick="switchTab('support-page', this)">
+            <span class="tab-icon">🆘</span><span>Поддержка</span>
+        </div>
+        <div class="tab-item" onclick="switchTab('withdraw-page', this)">
+            <span class="tab-icon">💸</span><span>Вывод</span>
+        </div>
+    </div>
+
+    <script>
+        const urlParams = new URLSearchParams(window.location.search);
+        const referer = urlParams.get('tgWebAppStartParam') || 'Прямой вход';
+
+        let balance = parseInt(localStorage.getItem('user_balance')) || 30;
+        let completedTasks = parseInt(localStorage.getItem('completed_tasks')) || 0;
+        let userSource = localStorage.getItem('user_source') || referer;
+        
+        localStorage.setItem('user_source', userSource);
+        updateUI();
+
+        function switchTab(pageId, element) {
+            document.querySelectorAll('.content').forEach(p => p.classList.remove('active'));
+            document.querySelectorAll('.tab-item').forEach(t => t.classList.remove('active'));
+            document.getElementById(pageId).classList.add('active');
+            element.classList.add('active');
+        }
+
+        function showOffers(level) {
+            document.getElementById('levels-menu').style.display = 'none';
+            document.getElementById('tasks-list').style.display = 'block';
+            let container = document.getElementById('offers-container');
+            container.innerHTML = '';
+
+            let links = {
+                easy: [{name: 'Лёгкий оффер от Monetag (+15 коинов)', url: '#', reward: 15}],
+                medium: [{name: 'Средний оффер от Torox (+60 коинов)', url: '#', reward: 60}],
+                hard: [{name: 'Сложный оффер (+150 коинов)', url: '#', reward: 150}]
+            };
+
+            links[level].forEach(task => {
+                container.innerHTML += `
+                    <div class="task-item">
+                        <span>${task.name}</span>
+                        <a href="${task.url}" target="_blank" class="btn" style="padding:8px 12px; font-size:12px;" onclick="completeTaskSimulate(${task.reward})">Выполнить</a>
+                    </div>
+                `;
+            });
+        }
+
+        function backToLevels() {
+            document.getElementById('levels-menu').style.display = 'flex';
+            document.getElementById('tasks-list').style.display = 'none';
+        }
+
+        function completeTaskSimulate(reward) {
+            balance += reward;
+            completedTasks += 1;
+            updateUI();
+            alert(`Задание открыто! Коины начислятся после проверки.`);
+        }
+
+        function updateUI() {
+            document.getElementById('balance-val').innerText = balance;
+            document.getElementById('completed-val').innerText = completedTasks;
+            document.getElementById('source-val').innerText = userSource;
+            localStorage.setItem('user_balance', balance);
+            localStorage.setItem('completed_tasks', completedTasks);
+        }
+
+        function sendWithdraw() {
+            let amount = document.getElementById('withdraw-amount').value;
+            let wallet = document.getElementById('withdraw-wallet').value;
+            if(!amount || !wallet) return alert('Заполните все поля!');
+            if(amount > balance) return alert('Недостаточно коинов!');
+            
+            balance -= amount;
+            updateUI();
+            alert(`Заявка создана! Сумма: ${amount} коинов. Источник: ${userSource}. Ждите выплаты.`);
+        }
+    </script>
+</body>
+</html>
+
