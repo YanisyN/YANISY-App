@@ -2,7 +2,6 @@
 <html lang="ru">
 <head>
     <meta charset="UTF-8">
-    <!-- ЖЕСТКО БЛОКИРУЕМ МАСШТАБ, ЧТОБЫ ЭКРАН НЕ СЪЕЗЖАЛ -->
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>YANISY Mini App</title>
     <style>
@@ -144,7 +143,7 @@
     <div id="tasks-page" class="content active">
         <div class="welcome-box" style="margin-bottom: 25px; max-width: 100%;">
             <h2 style="margin-top:0; color:#007AFF;">Привет! 👋</h2>
-            <p style="font-size: 14px; line-height: 1.5; margin: 0;">Я очень рада, что ты посещаешь мои мини-приложения. Выполняй задания и зарабатывай коины!</p>
+            <p style="font-size: 14px; line-height: 1.5; margin: 0;">Я очень рада, что ты посещаешь мои mini-приложения. Выполняй задания и зарабатывай коины!</p>
         </div>
         <h3 style="margin-left: 5px;">🔥 Доступные задания:</h3>
         <p style="font-size:13px; color:#8E8E93; margin-top: -10px; margin-bottom: 20px; margin-left: 5px;">Задания обновляются каждый день автоматически! ✨</p>
@@ -190,7 +189,6 @@
             <option value="alpha">🔴 Альфа-Банк</option>
         </select>
 
-        <!-- ТО САМОЕ КОЛЁСИКО ВЫБОРА РЕФЕРАЛОВ -->
         <label>3. От какого вы реферала (выберите из списка):</label>
         <select id="withdraw-ref">
             <option value="Реферал 1">👤 Реферал 1</option>
@@ -207,7 +205,7 @@
         <button class="btn btn-blue" onclick="sendWithdraw()">Коснитесь, чтобы вывести</button>
     </div>
 
-    <!-- НИЖНИЕ КНОПКИ МЕНЮ -->
+    <!-- НИЖНИЕ КНОПКИ -->
     <div class="tab-bar">
         <div class="tab-item active" onclick="switchTab('tasks-page', this)">
             <span class="tab-icon">📋</span><span>Задания</span>
@@ -220,22 +218,18 @@
         </div>
         <div class="tab-item" onclick="switchTab('withdraw-page', this)">
             <span class="tab-icon">💳</span><span>Вывод</span>
-            </div>
-<script>
-// Загрузка сохраненного прогресса из памяти устройства
+        </div>
+    </div>
+    <script>
 let balance = parseInt(localStorage.getItem('user_balance')) || 0;
 let completedTasks = parseInt(localStorage.getItem('completed_tasks')) || 0;
 let pendingTasks = parseInt(localStorage.getItem('pending_tasks')) || 0;
 
-// Автоматическая генерация 100 карточек для заработка на Monetag
 function generate100Cards() {
     const container = document.getElementById('cards-container');
     if (!container) return;
     container.innerHTML = '';
-    
-    // МЫ ДОБАВИЛИ НАГРАДЫ: за задания будут давать 10, 15, 20 или 25 коинов
-    const rewardsList =; 
-    
+    const rewardsList =;
     for (let i = 1; i <= 100; i++) {
         let reward = rewardsList[i % rewardsList.length];
         container.innerHTML += `
@@ -250,11 +244,9 @@ function generate100Cards() {
     }
 }
 
-// Запуск функций при открытии приложения
 generate100Cards();
 updateUI();
 
-// Функция плавного переключения вкладок в нижнем меню
 function switchTab(pageId, element) {
     document.querySelectorAll('.content').forEach(p => p.classList.remove('active'));
     document.querySelectorAll('.tab-item').forEach(t => t.classList.remove('active'));
@@ -262,16 +254,14 @@ function switchTab(pageId, element) {
     element.classList.add('active');
 }
 
-// Симуляция клика по заданию (награда начисляется, счётчик увеличивается)
 function completeTaskSimulate(reward) {
     pendingTasks += 1;
-    balance += reward; // Коины прибавляются за каждый клик!
+    balance += reward;
     localStorage.setItem('pending_tasks', pendingTasks);
     localStorage.setItem('user_balance', balance);
     updateUI();
 }
 
-// Обновление всех цифр и балансов на экранах в реальном времени
 function updateUI() {
     document.getElementById('global-balance').innerText = balance;
     document.getElementById('stat-done-coins').innerText = balance;
@@ -279,7 +269,6 @@ function updateUI() {
     document.getElementById('stat-check-count').innerText = pendingTasks;
 }
 
-// Логика нажатия на кнопку "Вывести"
 function sendWithdraw() {
     let amount = document.getElementById('withdraw-amount').value;
     let method = document.getElementById('withdraw-method').value;
@@ -287,12 +276,10 @@ function sendWithdraw() {
     let wallet = document.getElementById('withdraw-wallet').value;
     
     amount = parseInt(amount);
-    
     if (isNaN(amount) || amount <= 0 || !wallet) {
         alert('Пожалуйста, заполните все поля!');
         return;
     }
-    
     if (amount > balance) {
         alert('Недостаточно коинов на балансе!');
         return;
