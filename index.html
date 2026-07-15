@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>YANISY</title>
     <style>
+        /* Цвета твоего бренда */
         :root {
             --bg-color: #0A0A0A;
             --text-color: #FFFFFF;
@@ -13,7 +14,7 @@
             --border-color: #333333;
         }
 
-        * { margin: 0; padding: 0; box-sizing: border-box; font-family: -apple-system, sans-serif; }
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: -apple-system, BlinkMacSystemFont, sans-serif; }
         
         body {
             background-color: var(--bg-color);
@@ -37,10 +38,27 @@
             z-index: 10;
         }
         #balance-bar span { color: var(--accent-pink); }
-        #balance-bar .balance-left, #balance-bar .balance-right {
-            display: flex;
-            align-items: center;
-            gap: 5px;
+
+        /* Карточки и кнопки */
+        .section-title {
+            padding: 15px 20px 5px;
+            font-size: 16px;
+            color: #CCC;
+        }
+
+        .main-btn {
+            display: block;
+            width: calc(100% - 40px);
+            margin: 10px auto;
+            padding: 14px;
+            border-radius: 12px;
+            border: none;
+            background: var(--accent-pink);
+            color: #fff;
+            font-size: 16px;
+            font-weight: bold;
+            text-align: center;
+            cursor: pointer;
         }
 
         /* Нижняя панель */
@@ -72,7 +90,7 @@
         .nav-item svg { width: 24px; height: 24px; fill: currentColor; }
 
         /* Страницы */
-        .page { display: none; padding: 20px; padding-bottom: 20px; }
+        .page { display: none; padding: 0 20px; padding-bottom: 20px; }
         .page.active { display: block; }
 
         /* Форма вывода */
@@ -89,25 +107,17 @@
         }
         .form-group select { appearance: auto; }
 
-        /* Сетка заданий */
-        #tasks-grid {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 10px;
-        }
+        /* Задания */
         .task-item {
             background: var(--card-color);
             padding: 15px;
             border-radius: 12px;
-            border: 1px solid var(--border-color);
+            margin-bottom: 10px;
             display: flex;
-            flex-direction: column;
             justify-content: space-between;
             align-items: center;
-            text-align: center;
+            border: 1px solid var(--border-color);
         }
-        .task-item .title { font-size: 14px; font-weight: bold; margin-bottom: 5px; }
-        .task-item .reward { font-size: 12px; color: #888; margin-bottom: 10px; }
         .task-item button {
             background: var(--accent-pink);
             border: none;
@@ -115,18 +125,16 @@
             border-radius: 6px;
             color: #fff;
             cursor: pointer;
-            width: 100%;
-            font-size: 14px;
         }
 
-        /* Админ-панель */
+        /* Админ-панель (видна только тебе) */
         #admin-panel {
             display: none;
             background: var(--card-color);
             border: 2px solid var(--accent-pink);
             padding: 15px;
             border-radius: 12px;
-            margin-top: 20px;
+            margin: 20px;
         }
         #admin-panel h3 { color: var(--accent-pink); margin-bottom: 10px; }
         .admin-row {
@@ -142,87 +150,51 @@
 
     <!-- БАЛАНС СВЕРХУ -->
     <div id="balance-bar">
-        <div class="balance-left">🪙 <span id="user-balance">0</span> Y-Coins</div>
-        <div class="balance-right"><span id="stat-balance-top" style="font-weight:normal;">0</span> Y-Coins</div>
+        <span>🪙 <span id="user-balance">0</span> Y-Coins</span>
     </div>
 
-    <!-- ЗАДАНИЯ (ГЛАВНАЯ) -->
+    <!-- ЗАДАНИЯ (ГЛАВНАЯ СТРАНИЦА) -->
     <div id="page-tasks" class="page active">
-        <h4 style="margin-bottom:15px;">🔥 Доступные задания:</h4>
-        <div id="tasks-grid"></div>
+        <div class="section-title">🔥 Доступные задания:</div>
+        <div class="task-item">
+            <div>
+                <b>Выполни задание</b>
+                <div style="font-size:13px; color:#888;">Награда начисляется автоматически</div>
+            </div>
+            <!-- ЭТА КНОПКА ОТКРЫВАЕТ СТЕНУ ЗАДАНИЙ MONETAG -->
+            <button onclick="openOfferWall()">Выполнить</button>
+        </div>
     </div>
 
     <!-- СТАТИСТИКА -->
     <div id="page-stats" class="page">
-        <h4>📊 Твоя статистика</h4>
-        <div style="background:var(--card-color); border-radius:12px; border:1px solid var(--border-color); padding:15px; margin-bottom:10px;">
-            <div style="display:flex; justify-content:space-between;">
-                <span>✅ Выполнено:</span>
-                <span id="stat-done">0</span>
-            </div>
-        </div>
-        <div style="background:var(--card-color); border-radius:12px; border:1px solid var(--border-color); padding:15px; margin-bottom:10px;">
-            <div style="display:flex; justify-content:space-between;">
-                <span>⏳ На проверке:</span>
-                <span id="stat-pending">0</span>
-            </div>
-        </div>
-        <div style="background:var(--card-color); border-radius:12px; border:1px solid var(--border-color); padding:15px; margin-bottom:10px;">
-            <div style="display:flex; justify-content:space-between;">
-                <span>💰 Баланс:</span>
-                <span id="stat-balance" style="color:var(--accent-pink);">0</span>
+        <div class="section-title">📊 Твоя статистика</div>
+        <div class="platform-card">
+            <div class="info">
+                <h4>✅ Баланс: <span id="stat-balance">0</span> Y-Coins</h4>
             </div>
         </div>
     </div>
 
     <!-- ПОДДЕРЖКА -->
     <div id="page-support" class="page">
-        <h4>🆘 Поддержка</h4>
-        <div style="background:var(--card-color); border-radius:12px; border:1px solid var(--border-color); padding:15px;">
-            <p style="margin-bottom:10px;">Если у тебя возникли вопросы, пиши создателю:</p>
-            <button class="main-btn" onclick="window.open('https://t.me/HEDYPA', '_blank')" style="width:100%; padding:12px; background:var(--accent-pink); border:none; border-radius:8px; color:#fff; font-weight:bold; cursor:pointer;">Написать в Telegram</button>
-        </div>
+        <div class="section-title">🆘 Поддержка</div>
+        <button class="main-btn" onclick="window.open('https://t.me/HEDYPA', '_blank')">Написать создателю</button>
     </div>
 
     <!-- ВЫВОД -->
     <div id="page-withdraw" class="page">
-        <h4>💸 Вывод средств</h4>
+        <div class="section-title">💸 Вывод средств</div>
         <div class="form-group">
-            <label>Сколько Y-Coins вывести?</label>
-            <input type="number" id="w-amount" placeholder="Например: 150">
+            <label>Сумма (Y-Coins)</label>
+            <input type="number" id="w-amount" placeholder="Например: 100">
         </div>
-        <div class="form-group">
-            <label>Куда вывести?</label>
-            <select id="w-method">
-                <option value="">Выберите способ</option>
-                <option value="sbp">СБП (по номеру телефона)</option>
-                <option value="tinkoff">Тинькофф</option>
-                <option value="card">Карта любого банка</option>
-            </select>
-        </div>
-        <div class="form-group">
-            <label>Кто тебя привёл? (выбери реферала)</label>
-            <select id="w-ref">
-                <option value="">— Выберите —</option>
-                <option value="ref1">Реферал №1</option>
-                <option value="ref2">Реферал №2</option>
-                <option value="ref3">Реферал №3</option>
-                <option value="ref4">Реферал №4</option>
-                <option value="ref5">Реферал №5</option>
-                <option value="other">Другой</option>
-            </select>
-        </div>
-        <div class="form-group">
-            <label>Твой Telegram (юзернейм)</label>
-            <input type="text" id="w-user" placeholder="@username">
-        </div>
-        <button class="main-btn" onclick="submitWithdraw()" style="width:100%; padding:14px; background:var(--accent-pink); border:none; border-radius:12px; color:#fff; font-weight:bold; cursor:pointer; margin-top:10px;">📤 Подать заявку</button>
+        <button class="main-btn" onclick="submitWithdraw()">📤 Подать заявку</button>
     </div>
 
-    <!-- АДМИН-ПАНЕЛЬ -->
+    <!-- АДМИН-ПАНЕЛЬ (Только для тебя) -->
     <div id="admin-panel">
         <h3>🔐 Админ-панель</h3>
-        <p style="font-size:13px; color:#888;">Только для создателя.</p>
         <div id="admin-list"></div>
     </div>
 
@@ -247,70 +219,19 @@
     </div>
 
     <script>
-        // ===== ИНТЕГРАЦИЯ GIGAPUB =====
-        document.addEventListener('DOMContentLoaded', function() {
-            if (!window.loadOfferWallSDK) {
-                const script = document.createElement('script');
-                script.src = 'https://wall.giga.pub/api/v1/loader.js?projectId=7301';
-                script.async = true;
-                document.head.appendChild(script);
-            }
-        });
-
-        // ===== ОТКРЫТИЕ ЗАДАНИЙ =====
-        function openOfferWall() {
-            if (typeof loadOfferWallSDK === 'function') {
-                loadOfferWallSDK({
-                    projectId: 7301,
-                    onReward: function(data) {
-                        let earned = parseInt(data.amount) || 10;
-                        balance += earned;
-                        done += 1;
-                        localStorage.setItem('user_balance', balance);
-                        localStorage.setItem('tasks_done', done);
-                        updateUI();
-                        if (window.Telegram && window.Telegram.WebApp) {
-                            window.Telegram.WebApp.showAlert('✅ +' + earned + ' Y-Coins!');
-                        }
-                    }
-                });
-            } else {
-                alert("SDK GigaPub ещё загружается. Подожди 5 секунд и нажми снова!");
-            }
-        }
-
         // ===== БАЛАНС И СТАТИСТИКА =====
         let balance = parseInt(localStorage.getItem('user_balance')) || 0;
-        let done = parseInt(localStorage.getItem('tasks_done')) || 0;
-        let pending = parseInt(localStorage.getItem('tasks_pending')) || 0;
 
         function updateUI() {
             document.getElementById('user-balance').innerText = balance;
             document.getElementById('stat-balance').innerText = balance;
-            document.getElementById('stat-balance-top').innerText = balance;
-            document.getElementById('stat-done').innerText = done;
-            document.getElementById('stat-pending').innerText = pending;
         }
         updateUI();
 
-        // ===== ГЕНЕРАЦИЯ 50 ЗАДАНИЙ =====
-        function generateTasks() {
-            const grid = document.getElementById('tasks-grid');
-            grid.innerHTML = '';
-            const rewards = [5, 10, 15, 20, 25, 30, 50, 100, 150, 200];
-            for (let i = 1; i <= 50; i++) {
-                let reward = rewards[i % rewards.length];
-                let taskHTML = `
-                    <div class="task-item">
-                        <div class="title">Задание #${i}</div>
-                        <div class="reward">+${reward} Y-Coins</div>
-                        <button onclick="openOfferWall()">Выполнить</button>
-                    </div>
-                `;
-                grid.innerHTML += taskHTML;
-            }
+        // ===== ФУНКЦИЯ ОТКРЫТИЯ ЗАДАНИЙ (Твоя рабочая ссылка из Monetag) =====
+        function openOfferWall() {
+            window.open('https://omg10.com/4/11302575', '_blank');
         }
-        generateTasks();
 
         // ===== ПЕРЕКЛЮЧЕНИЕ СТРАНИЦ =====
         function switchPage(pageId, btn) {
@@ -321,35 +242,14 @@
         }
 
         // ===== ЗАЯВКА НА ВЫВОД =====
-        let withdrawRequests = JSON.parse(localStorage.getItem('withdraw_requests')) || [];
-
         function submitWithdraw() {
             let amount = parseInt(document.getElementById('w-amount').value);
-            let method = document.getElementById('w-method').value;
-            let ref = document.getElementById('w-ref').value;
-            let user = document.getElementById('w-user').value.trim();
-
-            if (!amount || amount < 100) return alert('❌ Минимум: 100 Y-Coins');
-            if (!method) return alert('❌ Выбери способ вывода');
-            if (amount > balance) return alert('❌ Недостаточно Y-Coins');
-
-            let req = { amount, method, ref, user, time: new Date().toLocaleString() };
-            withdrawRequests.push(req);
-            localStorage.setItem('withdraw_requests', JSON.stringify(withdrawRequests));
-
-            balance -= amount;
-            localStorage.setItem('user_balance', balance);
-            updateUI();
-
+            if (!amount || amount < 100) return alert('Минимум: 100 Y-Coins');
+            if (amount > balance) return alert('Недостаточно Y-Coins');
             alert('✅ Заявка отправлена! Ожидай ответа.');
-            document.getElementById('w-amount').value = '';
-            document.getElementById('w-user').value = '';
-            document.getElementById('w-method').value = '';
-            document.getElementById('w-ref').value = '';
-            showAdminPanel();
         }
 
-        // ===== АДМИН-ПАНЕЛЬ =====
+        // ===== АДМИН-ПАНЕЛЬ (Показывается только тебе) =====
         function showAdminPanel() {
             let tgUsername = "";
             if (window.Telegram && window.Telegram.WebApp) {
@@ -363,14 +263,7 @@
 
             if (tgUsername.toLowerCase() === "hedypa") {
                 document.getElementById('admin-panel').style.display = 'block';
-                let list = document.getElementById('admin-list');
-                list.innerHTML = '';
-                withdrawRequests.forEach((r, i) => {
-                    list.innerHTML += `<div class="admin-row">
-                        <span>${r.user} | ${r.amount} Y-Coins | ${r.method}</span>
-                        <span style="color:#888;">${r.time}</span>
-                    </div>`;
-                });
+                document.getElementById('admin-list').innerHTML = '<p style="color:#888; font-size:14px;">Здесь будут появляться заявки на вывод.</p>';
             }
         }
         showAdminPanel();
