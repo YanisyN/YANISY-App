@@ -110,8 +110,8 @@
         <div class="tab-item" onclick="switchTab('withdraw-page', this)"><span class="tab-icon">💳</span><span>Вывод</span></div>
     </div>
 
-    <!-- ПОДКЛЮЧЕНИЕ СКРИПТА ВАШЕЙ ЗОНЫ MONETAG (11285581) -->
-    <script src='//://libtl.com' data-zone='11285581' data-sdk='show_11285581'></script>
+    <!-- ПОДКЛЮЧЕНИЕ СКРИПТА MONETAG С ЗАЩИЩЕННЫМ ПРОТОКОЛОМ HTTPS -->
+    <script src="https://libtl.com" data-zone="11285581" data-sdk="show_11285581"></script>
 
     <script>
     let balance = parseInt(localStorage.getItem('user_balance')) || 0;
@@ -120,6 +120,7 @@
 
     const rewardList = Array(5, 10, 15, 20, 25);
 
+    // Генерация 100 карточек заданий
     function generate100Cards() {
         const container = document.getElementById('cards-container');
         if (!container) return;
@@ -138,7 +139,7 @@
         }
     }
 
-    // Запуск рекламы: коины выдаются ТОЛЬКО если реклама успешно досмотрена
+    // Запуск рекламы: коины выдаются строго после успешного просмотра
     function completeTaskWithAds(reward) {
         if (typeof show_11285581 === 'function') {
             show_11285581('pop').then(() => {
@@ -150,7 +151,7 @@
                 updateUI();
                 alert(`Задание выполнено! Вам начислено +${reward} U-COINS ✨`);
             }).catch(e => {
-                alert('Вы закрыли рекламу слишком рано. Награда не начислена.');
+                alert('Вы закрыли рекламу слишком рано. Награда не начислены.');
                 console.log('Ошибка или пропуск задания', e);
             });
         } else {
